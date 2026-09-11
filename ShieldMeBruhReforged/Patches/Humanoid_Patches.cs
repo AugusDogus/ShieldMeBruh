@@ -25,11 +25,9 @@ public static class Humanoid_Patches
                 }
                 else
                 {
-                    var savedData = ShieldMeBruhReforged.AutoShield.GetShieldSaveData();
-
-                    if (savedData.SavedElement.x >= 0 && savedData.SavedElement.y >= 0)
+                    if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedPosition)
                     {
-                        var equipItem = player.m_inventory.GetItemAt(savedData.SavedElement.x, savedData.SavedElement.y);
+                        var equipItem = player.m_inventory.GetItemAt(savedPosition.x, savedPosition.y);
                         if (equipItem != null && equipItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
                         {
                             player.EquipItem(equipItem);                    
@@ -53,10 +51,9 @@ public static class Humanoid_Patches
 
                 if (ShieldMeBruhReforged.AutoShield.CurrentElement == null && ShieldMeBruhReforged.AutoShield.SelectedShield == null)
                 {
-                    var savedData = ShieldMeBruhReforged.AutoShield.GetShieldSaveData();
-                    if (savedData.SavedElement.x >= 0 && savedData.SavedElement.y >= 0)
+                    if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedPosition)
                     {
-                        equipItem = player.m_inventory.GetItemAt(savedData.SavedElement.x, savedData.SavedElement.y);
+                        equipItem = player.m_inventory.GetItemAt(savedPosition.x, savedPosition.y);
 
                         if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon &&
                             equipItem != null && ___m_leftItem.m_shared.m_name == equipItem.m_shared.m_name &&

@@ -6,7 +6,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Mono.Cecil" Version="0.11.6" />
-        <Reference Include="$(BepInExDir)/core/0Harmony.dll" />
+        <Compile Include="../../ShieldMeBruhReforged/Features/ShieldSelection.cs" Link="ShieldSelection.cs" />
     </ItemGroup>
 </Project>

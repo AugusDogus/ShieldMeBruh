@@ -8,6 +8,17 @@ If your installation uses a different data directory, pass
 
 ## Compatibility checks
 
+Run the selection persistence checks without game dependencies:
+
+```sh
+dotnet run --project tests/SelectionCheck
+```
+
+These cover round trips, deselection, malformed and out-of-bounds coordinates,
+culture-independent formatting, and preservation of unrelated metadata.
+
+Check the compiled plugin against your installed game:
+
 ```sh
 dotnet run --project tests/CompatibilityCheck \
   -p:BepInExDir="/path/to/profile/BepInEx" -- \
@@ -44,3 +55,8 @@ Import the ZIP through r2modman's **Import local mod**. Use author
 The plugin ID and character save-data key are `augusdogus.mods.shieldmebruhreforged`.
 Configuration is stored at `BepInEx/config/augusdogus.mods.shieldmebruhreforged.cfg`.
 Reforged does not read or migrate the original mod's configuration or saved selection.
+
+The selection value is `x,y` with invariant integer formatting in `Player.m_customData`.
+Valheim's existing character save/load code persists it. Missing, malformed, and
+out-of-bounds values mean no selection; deselecting removes the key. Earlier YAML
+values are not migrated. No serialization library is required.

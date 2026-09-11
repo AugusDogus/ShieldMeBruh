@@ -13,8 +13,7 @@ Automatically equip your preferred shield when you draw a one-handed weapon.
 
 ## Installation
 
-Requires **Valheim 1.0.12**, **BepInExPack_Valheim 5.4.2350**, and
-**ValheimModding-YamlDotNet 16.3.1**.
+Requires **Valheim 1.0.12** and **BepInExPack_Valheim 5.4.2350**.
 
 1. Install the dependencies in your r2modman profile.
 2. Build the project using the instructions below.
@@ -33,6 +32,9 @@ Compilation and compatibility checks pass; in-game testing is still pending.
 deselect. A shield marker shows your selection.
 
 Auto-equip and auto-unequip can be toggled in the mod's BepInEx configuration.
+
+Your selection is stored as plain-text coordinates in the character's custom
+data. Deselecting removes the entry. Vanilla does not use this mod-specific entry.
 
 ## Build
 

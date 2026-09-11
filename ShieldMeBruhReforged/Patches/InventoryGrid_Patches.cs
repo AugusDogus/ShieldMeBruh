@@ -55,9 +55,7 @@ public static class InventoryGrid_Patches
             if (!_initializedElement && Player.m_localPlayer.m_customData.ContainsKey(ShieldMeBruhReforged.PluginId))
             {
                 
-                var savedElementVector = ShieldMeBruhReforged.AutoShield.GetShieldSaveData().SavedElement;
-
-                if (savedElementVector.x >= 0 && savedElementVector.y >= 0)
+                if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedElementVector)
                 {
                     var savedElement =
                         __instance.GetElement(savedElementVector.x, savedElementVector.y, __instance.m_width);

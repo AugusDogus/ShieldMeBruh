@@ -40,14 +40,9 @@ public static class DeathEvent
 
                 if (__instance.m_container.m_name.Equals(name))
                 {
-                    var savedElementVector = ShieldMeBruhReforged.AutoShield.GetShieldSaveData()?.SavedElement;
-                    
-                    if (savedElementVector == null)
-                        return;
-
-                    if (savedElementVector.Value.x >= 0 && savedElementVector.Value.y >= 0)
+                    if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedElementVector)
                     {
-                        var savedItem = player.GetInventory().GetItemAt(savedElementVector.Value.x, savedElementVector.Value.y);
+                        var savedItem = player.GetInventory().GetItemAt(savedElementVector.x, savedElementVector.y);
                         
                         if (player.GetInventory() == null)
                             return;
@@ -63,7 +58,7 @@ public static class DeathEvent
                         }
                         else
                         {
-                            savedElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance().GetElement(savedElementVector.Value.x, savedElementVector.Value.y, player.GetInventory().m_width);
+                            savedElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance().GetElement(savedElementVector.x, savedElementVector.y, player.GetInventory().m_width);
                         }
                         
                         if (savedElement != null && savedItem != null)

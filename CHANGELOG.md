@@ -6,6 +6,8 @@
 * Target .NET Standard 2.1 and the current Valheim game assemblies.
 * Use Valheim's new InventoryElement component for shield selection and markers.
 * Replace the bundled Vapok library and Jotunn initialization with BepInEx configuration and logging.
+* Remove YamlDotNet and store shield coordinates as validated text in character metadata.
+* Clear the saved selection when deselecting a shield.
 * Keep inventory input registered when auto-shield starts disabled, so enabling it during play works.
 * Add a portable build, automatic assembly publicizing, a ZIP packaging target, and static compatibility checks.
 

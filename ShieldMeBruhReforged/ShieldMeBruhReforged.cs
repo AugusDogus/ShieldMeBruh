@@ -7,7 +7,6 @@ using ShieldMeBruhReforged.Features;
 namespace ShieldMeBruhReforged;
 
 [BepInPlugin(PluginId, "Shield Me Bruh Reforged", "1.0.0")]
-[BepInDependency("com.ValheimModding.YamlDotNetDetector")]
 public class ShieldMeBruhReforged : BaseUnityPlugin
 {
     public const string PluginId = "augusdogus.mods.shieldmebruhreforged";

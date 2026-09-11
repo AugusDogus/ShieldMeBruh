@@ -11,7 +11,6 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" ExcludeAssets="runtime" />
-        <PackageReference Include="YamlDotNet" Version="16.3.0" ExcludeAssets="runtime" />
         <!-- Unity supplies the game's transitive runtime dependencies. -->
         <Reference Include="$(ManagedDir)/assembly_valheim.dll" Publicize="true" Private="false" ExternallyResolved="true" />
         <Reference Include="$(ManagedDir)/assembly_utils.dll" Publicize="true" Private="false" ExternallyResolved="true" />

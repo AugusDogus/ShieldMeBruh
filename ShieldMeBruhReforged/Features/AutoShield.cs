@@ -5,16 +5,9 @@ using BepInEx.Configuration;
 using ShieldMeBruhReforged.Patches;
 using UnityEngine;
 using UnityEngine.UI;
-using YamlDotNet.Serialization;
 using Object = UnityEngine.Object;
 
 namespace ShieldMeBruhReforged.Features;
-
-public class AutoShieldSaveData
-{
-    public Vector2i SavedElement { get; set; }
-    public string ItemName { get; set; }
-}
 
 public class AutoShield : IDisposable
 {
@@ -243,6 +236,7 @@ public class AutoShield : IDisposable
 
         CurrentElement = null;
         SelectedShield = null;
+        SaveShieldSelection();
     }
 
     public void ApplyShieldToElement(InventoryElement selectedElement, ItemDrop.ItemData itemAt, bool allowReset = false)
@@ -275,14 +269,7 @@ public class AutoShield : IDisposable
             }
         }
 
-        var saveVector = new Vector2i(-1, -1);
-
-        if (CurrentElement != null) saveVector = new Vector2i(CurrentElement.Position.x, CurrentElement.Position.y);
-
-        var savedData = new AutoShieldSaveData();
-        savedData.SavedElement = saveVector;
-
-        SaveShieldSaveData(savedData);
+        SaveShieldSelection();
         
         SetEnabledStatus();
     }
@@ -333,37 +320,22 @@ public class AutoShield : IDisposable
         SelectedShield = null;
     }
 
-    public AutoShieldSaveData GetShieldSaveData()
+    public Vector2i? GetSavedShieldPosition()
     {
-        var outputData = new AutoShieldSaveData()
-        {
-            SavedElement = new Vector2i(-1,-1)
-        };
+        if (Player.m_localPlayer is not { } player)
+            return null;
 
-        if (Player.m_localPlayer.m_customData.ContainsKey(ShieldMeBruhReforged.PluginId))
-        {
-            var deserializer = new DeserializerBuilder().Build();
-
-            var yaml = deserializer.Deserialize<AutoShieldSaveData>(
-                Player.m_localPlayer.m_customData[ShieldMeBruhReforged.PluginId]);
-
-            outputData = yaml;
-        }
-
-        return outputData;
+        var inventory = player.GetInventory();
+        var selection = ShieldSelection.Read(player.m_customData, ShieldMeBruhReforged.PluginId,
+            inventory.GetWidth(), inventory.GetHeight());
+        return selection is { } slot ? new Vector2i(slot.X, slot.Y) : null;
     }
 
-    public void SaveShieldSaveData(AutoShieldSaveData savedData)
+    private void SaveShieldSelection()
     {
-        var serializer = new SerializerBuilder().Build();
-
-        var yaml = serializer.Serialize(savedData);
-
-        if (Player.m_localPlayer.m_customData.ContainsKey(ShieldMeBruhReforged.PluginId))
-            Player.m_localPlayer.m_customData[ShieldMeBruhReforged.PluginId] = yaml;
-        else
-            Player.m_localPlayer.m_customData.Add(ShieldMeBruhReforged.PluginId, yaml);
-
+        if (Player.m_localPlayer is { } player)
+            ShieldSelection.Save(player.m_customData, ShieldMeBruhReforged.PluginId,
+                CurrentElement != null ? (CurrentElement.Position.x, CurrentElement.Position.y) : null);
     }
     
     public static class ResetEvent
