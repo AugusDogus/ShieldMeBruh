@@ -16,7 +16,8 @@ Automatically equip your preferred shield when you draw a one-handed weapon.
 Requires **Valheim 1.0.12** and **BepInExPack_Valheim 5.4.2350**.
 
 1. Install the dependencies in your r2modman profile.
-2. Build the project using the instructions below.
+2. Download the package from [GitHub Actions](https://github.com/AugusDogus/ShieldMeBruhReforged/actions),
+   or build the project using the instructions below.
 3. Close Valheim and copy `ShieldMeBruhReforged.dll` into your profile's
    `BepInEx/plugins/ShieldMeBruhReforged/` directory.
 4. Launch with **Start modded**.
@@ -39,6 +40,9 @@ data. Deselecting removes the entry. Vanilla does not use this mod-specific entr
 ## Build
 
 Requires .NET SDK 8 or later and the game dependencies above.
+
+GitHub Actions also builds and checks the plugin automatically. Published stable
+GitHub releases upload the built package to Thunderstore once publishing is configured.
 
 ```sh
 dotnet build ShieldMeBruhReforged.sln -c Release \

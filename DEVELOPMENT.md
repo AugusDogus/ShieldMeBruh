@@ -50,6 +50,36 @@ Output: `artifacts/ShieldMeBruhReforged-1.0.0-valheim-1.0.12.zip`.
 Import the ZIP through r2modman's **Import local mod**. Use author
 `AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.0`.
 
+## GitHub Actions
+
+The **Build and publish** workflow compiles the plugin on GitHub for pushes to
+`main`, pull requests, manual runs, and published releases. It downloads current
+public Valheim dedicated-server assemblies through anonymous SteamCMD and the
+BepInEx version listed in `manifest.json`. No local game installation or Steam
+credentials are needed. This follows [Jötunn's CI approach](https://github.com/Valheim-Modding/Jotunn/blob/master/.github/workflows/pull-request.yml).
+
+Each build runs the selection and compatibility checks, validates the package,
+and uploads a `thunderstore-package` Actions artifact. Game assemblies are not
+included. These checks do not replace in-game testing.
+
+For publishing, configure these repository Actions settings:
+
+- Variable `THUNDERSTORE_NAMESPACE`: `AugusDogus`.
+- Secret `TCLI_AUTH_TOKEN`: a service-account token for that Thunderstore team.
+  Create it under Thunderstore **Settings > Teams > AugusDogus > Service Accounts**.
+
+To release, update the version in `manifest.json`, the project file, `BepInPlugin`,
+and both assembly version attributes, then update the changelog. Commit and push,
+then publish a stable GitHub release tagged `v1.0.0` or `1.0.0` (using the new version).
+The tag must match the source versions. The workflow builds the tagged source,
+attaches its ZIP to the release, and uploads that same ZIP using Thunderstore's
+official CLI. You do not need to build or attach anything manually.
+
+Pull requests, ordinary pushes, manual runs, and prereleases only build and check;
+they do not publish to Thunderstore. If publishing fails, the built artifact remains
+available. After correcting missing credentials or settings, rerun the failed job.
+For a version already published to Thunderstore, make a new version instead.
+
 ## Plugin identity
 
 The plugin ID and character save-data key are `augusdogus.mods.shieldmebruhreforged`.

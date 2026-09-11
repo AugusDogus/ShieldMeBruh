@@ -10,6 +10,7 @@
 * Clear the saved selection when deselecting a shield.
 * Keep inventory input registered when auto-shield starts disabled, so enabling it during play works.
 * Add a portable build, automatic assembly publicizing, a ZIP packaging target, and static compatibility checks.
+* Build and validate packages in GitHub Actions, and publish stable releases to Thunderstore.
 
 ## Upstream 1.1.2 - Updating Dependencies
 * Updated to latest version of dependencies

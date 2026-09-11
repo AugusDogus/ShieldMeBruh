@@ -1,0 +1,136 @@
+name: Build and publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.package.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install SteamCMD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lib32gcc-s1
+          mkdir -p "$RUNNER_TEMP/steamcmd"
+          curl --fail --location --retry 3 \
+            https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
+            -o "$RUNNER_TEMP/steamcmd.tar.gz"
+          tar -xzf "$RUNNER_TEMP/steamcmd.tar.gz" -C "$RUNNER_TEMP/steamcmd"
+          echo "MANAGED_DIR=$RUNNER_TEMP/valheim/valheim_server_Data/Managed" >> "$GITHUB_ENV"
+          echo "BEPINEX_DIR=$RUNNER_TEMP/bepinex/BepInExPack_Valheim/BepInEx" >> "$GITHUB_ENV"
+
+      - name: Download game and BepInEx references
+        run: |
+          "$RUNNER_TEMP/steamcmd/steamcmd.sh" \
+            +force_install_dir "$RUNNER_TEMP/valheim" \
+            +login anonymous +app_update 896660 validate +quit
+          test -f "$MANAGED_DIR/assembly_valheim.dll"
+          bepinex_version=$(jq -er '.dependencies[] | select(startswith("denikson-BepInExPack_Valheim-")) | ltrimstr("denikson-BepInExPack_Valheim-")' manifest.json)
+          curl --fail --location --retry 3 \
+            "https://thunderstore.io/package/download/denikson/BepInExPack_Valheim/$bepinex_version/" \
+            -o "$RUNNER_TEMP/bepinex.zip"
+          unzip -q "$RUNNER_TEMP/bepinex.zip" -d "$RUNNER_TEMP/bepinex"
+
+      - name: Check selection persistence
+        run: dotnet run --project tests/SelectionCheck -c Release
+
+      - name: Build plugin and package
+        run: |
+          dotnet build ShieldMeBruhReforged/ShieldMeBruhReforged.csproj \
+            -c Release -t:Package \
+            -p:ManagedDir="$MANAGED_DIR" -p:BepInExDir="$BEPINEX_DIR"
+
+      - name: Check game compatibility
+        run: |
+          dotnet run --project tests/CompatibilityCheck -c Release \
+            -p:BepInExDir="$BEPINEX_DIR" -- \
+            "$MANAGED_DIR" "$BEPINEX_DIR" \
+            ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll
+
+      - name: Validate package and release version
+        id: package
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+        run: python3 .github/scripts/validate-package.py
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: thunderstore-package
+          path: artifacts/ShieldMeBruhReforged-*.zip
+          if-no-files-found: error
+
+  publish:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: thunderstore-publish
+      cancel-in-progress: false
+    env:
+      PACKAGE_VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: thunderstore-package
+          path: artifacts
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Attach package to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" artifacts/ShieldMeBruhReforged-*.zip --clobber
+
+      - name: Install Thunderstore CLI
+        run: dotnet tool install --global tcli --version 0.2.4
+
+      - name: Publish to Thunderstore
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
+          THUNDERSTORE_NAMESPACE: ${{ vars.THUNDERSTORE_NAMESPACE }}
+        run: |
+          if [[ -z "$TCLI_AUTH_TOKEN" || -z "$THUNDERSTORE_NAMESPACE" ]]; then
+            echo "::error::Set the TCLI_AUTH_TOKEN Actions secret and THUNDERSTORE_NAMESPACE Actions variable. The built ZIP is available on the GitHub release; rerun this job after setup."
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          metadata = {
+              "namespace": os.environ["THUNDERSTORE_NAMESPACE"],
+              "name": "ShieldMeBruhReforged",
+              "versionNumber": os.environ["PACKAGE_VERSION"],
+          }
+          config = Path("thunderstore.toml").read_text() + "\n[package]\n"
+          config += "".join(f"{key} = {json.dumps(value)}\n" for key, value in metadata.items())
+          (Path(os.environ["RUNNER_TEMP"]) / "publish.toml").write_text(config)
+          PY
+          tcli publish --config-path "$RUNNER_TEMP/publish.toml" \
+            --file artifacts/ShieldMeBruhReforged-*.zip
