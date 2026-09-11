@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using ShieldMeBruh.Features;
+using ShieldMeBruhReforged.Features;
 
-namespace ShieldMeBruh.Patches;
+namespace ShieldMeBruhReforged.Patches;
 
 public static class Player_Patches
 {

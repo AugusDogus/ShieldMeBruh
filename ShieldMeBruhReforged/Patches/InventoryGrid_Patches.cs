@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace ShieldMeBruh.Patches;
+namespace ShieldMeBruhReforged.Patches;
 
 public static class InventoryGrid_Patches
 {
@@ -17,9 +17,6 @@ public static class InventoryGrid_Patches
         [HarmonyPriority(Priority.First)]
         private static void Prefix(InventoryGrid __instance, ref bool __state)
         {
-            if (!ShieldMeBruh.AutoShield.FeatureInitialized)
-                return;
-
             if (!__instance.name.Equals("PlayerGrid"))
                 return;
 
@@ -30,8 +27,8 @@ public static class InventoryGrid_Patches
 
             if (__instance.m_width != width || __instance.m_height != height)
             {
-                ShieldMeBruh.Log.Debug($"Width {width} doesn't match {__instance.m_width}");
-                ShieldMeBruh.Log.Debug($"Height {height} doesn't match {__instance.m_height}");
+                ShieldMeBruhReforged.Log.LogDebug($"Width {width} doesn't match {__instance.m_width}");
+                ShieldMeBruhReforged.Log.LogDebug($"Height {height} doesn't match {__instance.m_height}");
                 __state = true;
                 _initializedElement = false;
             }
@@ -45,20 +42,20 @@ public static class InventoryGrid_Patches
             if (!__state || !__runOriginal)
                 return;
 
-            ShieldMeBruh.Log.Debug("Inventory Grid needs to init.");
+            ShieldMeBruhReforged.Log.LogDebug("Inventory Grid needs to init.");
             
             foreach (var element in __instance.m_elements)
             {
-                var gameObject = element.m_go;
+                var gameObject = element.gameObject;
                 var inputHandler = gameObject.GetComponentInChildren<UIInputHandler>();
-                inputHandler.m_onMiddleDown += ShieldMeBruh.AutoShield.OnMiddleClick;
-                ShieldMeBruh.Log.Debug($"Adding to element: X: {element.m_pos.x}  Y: {element.m_pos.y}");
+                inputHandler.m_onMiddleDown += ShieldMeBruhReforged.AutoShield.OnMiddleClick;
+                ShieldMeBruhReforged.Log.LogDebug($"Adding to element: X: {element.Position.x}  Y: {element.Position.y}");
             }
 
-            if (!_initializedElement && Player.m_localPlayer.m_customData.ContainsKey("vapok.mods.shieldmebruh"))
+            if (!_initializedElement && Player.m_localPlayer.m_customData.ContainsKey(ShieldMeBruhReforged.PluginId))
             {
                 
-                var savedElementVector = ShieldMeBruh.AutoShield.GetShieldSaveData().SavedElement;
+                var savedElementVector = ShieldMeBruhReforged.AutoShield.GetShieldSaveData().SavedElement;
 
                 if (savedElementVector.x >= 0 && savedElementVector.y >= 0)
                 {
@@ -66,7 +63,7 @@ public static class InventoryGrid_Patches
                         __instance.GetElement(savedElementVector.x, savedElementVector.y, __instance.m_width);
                     var savedItem = __instance.m_inventory.GetItemAt(savedElementVector.x, savedElementVector.y);
 
-                    if (savedElement != null && savedItem != null) ShieldMeBruh.AutoShield.ApplyShieldToElement(savedElement, savedItem);
+                    if (savedElement != null && savedItem != null) ShieldMeBruhReforged.AutoShield.ApplyShieldToElement(savedElement, savedItem);
                 }
 
                 _initializedElement = true;

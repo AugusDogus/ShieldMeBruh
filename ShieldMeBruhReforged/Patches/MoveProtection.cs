@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace ShieldMeBruh.Patches;
+namespace ShieldMeBruhReforged.Patches;
 
 public static class MoveProtection
 {
@@ -8,8 +8,8 @@ public static class MoveProtection
     private static bool _movingWithMoveItemToThis;
     private static bool _movingWithDropItem;
     private static bool _reEnableShieldOnDropItem;
-    private static InventoryGrid.Element _futureElement;
-    private static InventoryGrid.Element _oldElement;
+    private static InventoryElement _futureElement;
+    private static InventoryElement _oldElement;
 
     [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), typeof(Inventory), typeof(ItemDrop.ItemData))]
     private static class MoveItemPatch
@@ -19,7 +19,7 @@ public static class MoveProtection
             if (_movingWithDropItem)
                 return;
 
-            if (ShieldMeBruh.AutoShield.CurrentElement == null && ShieldMeBruh.AutoShield.SelectedShield == null)
+            if (ShieldMeBruhReforged.AutoShield.CurrentElement == null && ShieldMeBruhReforged.AutoShield.SelectedShield == null)
                 return;
 
             if (__instance == null || fromInventory == null || item == null)
@@ -27,7 +27,7 @@ public static class MoveProtection
 
             if (!__instance.m_name.Equals("Inventory"))
             {
-                ShieldMeBruh.AutoShield.ResetCurrentSheildElement();
+                ShieldMeBruhReforged.AutoShield.ResetCurrentSheildElement();
             }
         }
     }
@@ -40,7 +40,7 @@ public static class MoveProtection
             if (_movingWithDropItem)
                 return;
 
-            if (ShieldMeBruh.AutoShield.CurrentElement == null && ShieldMeBruh.AutoShield.SelectedShield == null)
+            if (ShieldMeBruhReforged.AutoShield.CurrentElement == null && ShieldMeBruhReforged.AutoShield.SelectedShield == null)
                 return;
 
             if (__instance == null || fromInventory == null || item == null)
@@ -56,19 +56,19 @@ public static class MoveProtection
             if (__instance.m_name.Equals("Inventory"))
             {
                 //Scenario 2:
-                if (item != ShieldMeBruh.AutoShield.SelectedShield)
+                if (item != ShieldMeBruhReforged.AutoShield.SelectedShield)
                 {
                     //Peer into the next item
-                    var targetElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var targetElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(x, y, __instance.m_width);
-                    var sourceElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var sourceElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(item.m_gridPos.x, item.m_gridPos.y, __instance.m_width);
                     var itemAt = __instance.GetItemAt(x, y);
 
                     if (targetElement == null || sourceElement == null || itemAt == null)
                         return;
 
-                    if (itemAt != ShieldMeBruh.AutoShield.SelectedShield)
+                    if (itemAt != ShieldMeBruhReforged.AutoShield.SelectedShield)
                         return;
 
                     _futureElement = sourceElement;
@@ -77,9 +77,9 @@ public static class MoveProtection
                 else
                 {
                     //Scenario 1:
-                    var targetElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var targetElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(x, y, __instance.m_width);
-                    var sourceElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var sourceElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(item.m_gridPos.x, item.m_gridPos.y, __instance.m_width);
 
                     if (targetElement == null || sourceElement == null)
@@ -105,12 +105,12 @@ public static class MoveProtection
 
             if (_reEnableShield)
             {
-                var newItem = __instance.GetItemAt(_futureElement.m_pos.x, _futureElement.m_pos.y);
+                var newItem = __instance.GetItemAt(_futureElement.Position.x, _futureElement.Position.y);
 
                 if (newItem != null && _oldElement != null && _futureElement != null) 
                 {
-                    ShieldMeBruh.AutoShield.ResetCurrentSheildElement(_oldElement);
-                    ShieldMeBruh.AutoShield.ApplyShieldToElement(_futureElement, newItem);
+                    ShieldMeBruhReforged.AutoShield.ResetCurrentSheildElement(_oldElement);
+                    ShieldMeBruhReforged.AutoShield.ApplyShieldToElement(_futureElement, newItem);
                 }
                 _reEnableShield = false;
             }
@@ -129,7 +129,7 @@ public static class MoveProtection
         private static void Postfix(Inventory __instance, ItemDrop.ItemData item, bool __runOriginal)
         {
             if (item == null || !__runOriginal || __instance == null ||
-                ShieldMeBruh.AutoShield.CurrentElement == null || ShieldMeBruh.AutoShield.SelectedShield == null ||
+                ShieldMeBruhReforged.AutoShield.CurrentElement == null || ShieldMeBruhReforged.AutoShield.SelectedShield == null ||
                 _movingWithDropItem || _movingWithMoveItemToThis)
                 return;
 
@@ -137,8 +137,8 @@ public static class MoveProtection
                 return;
 
             //if item.pos of item being removed equal CurrentElement.pos then reset.
-            if (item.m_gridPos == ShieldMeBruh.AutoShield.CurrentElement.m_pos)
-                ShieldMeBruh.AutoShield.ResetCurrentSheildElement();
+            if (item.m_gridPos == ShieldMeBruhReforged.AutoShield.CurrentElement.Position)
+                ShieldMeBruhReforged.AutoShield.ResetCurrentSheildElement();
         }
     }
 
@@ -152,7 +152,7 @@ public static class MoveProtection
             if (item == null || __instance == null)
                 return;
             
-            if (ShieldMeBruh.AutoShield.SelectedShield == null || ShieldMeBruh.AutoShield.GetActiveInstance() == null)
+            if (ShieldMeBruhReforged.AutoShield.SelectedShield == null || ShieldMeBruhReforged.AutoShield.GetActiveInstance() == null)
                 return;
 
             /* Two Scenarios:
@@ -165,17 +165,17 @@ public static class MoveProtection
             if (__instance.name.Equals("PlayerGrid"))
             {
                 //Scenario 2:
-                if (item != ShieldMeBruh.AutoShield.SelectedShield)
+                if (item != ShieldMeBruhReforged.AutoShield.SelectedShield)
                 {
                     //Peer into the next item
-                    var targetElement = ShieldMeBruh.AutoShield.GetActiveInstance().GetElement(pos.x, pos.y, __instance.m_width);
-                    var sourceElement = ShieldMeBruh.AutoShield.GetActiveInstance().GetElement(item.m_gridPos.x, item.m_gridPos.y, __instance.m_width);
+                    var targetElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance().GetElement(pos.x, pos.y, __instance.m_width);
+                    var sourceElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance().GetElement(item.m_gridPos.x, item.m_gridPos.y, __instance.m_width);
                     var itemAt = __instance.m_inventory.GetItemAt(pos.x, pos.y);
 
                     if (targetElement == null || sourceElement == null || itemAt == null)
                         return;
 
-                    if (itemAt != ShieldMeBruh.AutoShield.SelectedShield)
+                    if (itemAt != ShieldMeBruhReforged.AutoShield.SelectedShield)
                         return;
 
                     _futureElement = sourceElement;
@@ -184,9 +184,9 @@ public static class MoveProtection
                 else
                 {
                     //Scenario 1:
-                    var targetElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var targetElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(pos.x, pos.y, __instance.m_width);
-                    var sourceElement = ShieldMeBruh.AutoShield.GetActiveInstance()
+                    var sourceElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance()
                         .GetElement(item.m_gridPos.x, item.m_gridPos.y, __instance.m_width);
 
                     if (targetElement == null || sourceElement == null)
@@ -216,12 +216,12 @@ public static class MoveProtection
 
             if (_reEnableShieldOnDropItem)
             {
-                var newItem = __instance.m_inventory.GetItemAt(_futureElement.m_pos.x, _futureElement.m_pos.y);
+                var newItem = __instance.m_inventory.GetItemAt(_futureElement.Position.x, _futureElement.Position.y);
 
                 if (newItem != null && _oldElement != null && _futureElement != null)
                 {
-                    ShieldMeBruh.AutoShield.ResetCurrentSheildElement(_oldElement);
-                    ShieldMeBruh.AutoShield.ApplyShieldToElement(_futureElement, newItem);
+                    ShieldMeBruhReforged.AutoShield.ResetCurrentSheildElement(_oldElement);
+                    ShieldMeBruhReforged.AutoShield.ApplyShieldToElement(_futureElement, newItem);
                 }
                 _reEnableShieldOnDropItem = false;
             }

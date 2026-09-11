@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using HarmonyLib;
 
-namespace ShieldMeBruh.Patches;
+namespace ShieldMeBruhReforged.Patches;
 
 public static class DeathEvent
 {
@@ -14,7 +14,7 @@ public static class DeathEvent
         {
             if (__runOriginal)
             {
-                ShieldMeBruh.AutoShield.SetShieldStatus(false);
+                ShieldMeBruhReforged.AutoShield.SetShieldStatus(false);
                 DeathInProgress = true;
             }
                 
@@ -40,7 +40,7 @@ public static class DeathEvent
 
                 if (__instance.m_container.m_name.Equals(name))
                 {
-                    var savedElementVector = ShieldMeBruh.AutoShield.GetShieldSaveData()?.SavedElement;
+                    var savedElementVector = ShieldMeBruhReforged.AutoShield.GetShieldSaveData()?.SavedElement;
                     
                     if (savedElementVector == null)
                         return;
@@ -52,25 +52,25 @@ public static class DeathEvent
                         if (player.GetInventory() == null)
                             return;
 
-                        InventoryGrid.Element savedElement = null;
+                        InventoryElement savedElement = null;
                         
-                        if (ShieldMeBruh.AutoShield.GetActiveInstance() == null)
+                        if (ShieldMeBruhReforged.AutoShield.GetActiveInstance() == null)
                         {
-                            if (ShieldMeBruh.AutoShield.CurrentElement != null)
+                            if (ShieldMeBruhReforged.AutoShield.CurrentElement != null)
                             {
-                                savedElement = ShieldMeBruh.AutoShield.CurrentElement;
+                                savedElement = ShieldMeBruhReforged.AutoShield.CurrentElement;
                             }
                         }
                         else
                         {
-                            savedElement = ShieldMeBruh.AutoShield.GetActiveInstance().GetElement(savedElementVector.Value.x, savedElementVector.Value.y, player.GetInventory().m_width);                            
+                            savedElement = ShieldMeBruhReforged.AutoShield.GetActiveInstance().GetElement(savedElementVector.Value.x, savedElementVector.Value.y, player.GetInventory().m_width);
                         }
                         
                         if (savedElement != null && savedItem != null)
                         {
                             if (savedItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
                             {
-                                ShieldMeBruh.AutoShield.ApplyShieldToElement(savedElement, savedItem);
+                                ShieldMeBruhReforged.AutoShield.ApplyShieldToElement(savedElement, savedItem);
                             }
                         }
                     }
