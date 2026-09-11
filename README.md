@@ -2,56 +2,53 @@
   <img src="banner.png" alt="Shield Me Bruh Reforged: auto-equip shields for Valheim" width="900">
 </p>
 
-An independent fork of [Shield Me Bruh! by Vapok](https://github.com/Vapok/ShieldMeBruh), maintained by AugusDogus for Valheim 1.0.12. Automatically equips a selected shield when a one-handed weapon is equipped.
+Automatically equip your preferred shield when you draw a one-handed weapon.
 
-Source: [AugusDogus/ShieldMeBruhReforged](https://github.com/AugusDogus/ShieldMeBruhReforged) (private repository).
+## Features
 
-To set the desired shield, open the Player Inventory and **middle-click** the desired shield to auto-equip.  Press the **middle-mouse** button again to _deselect_ the shield.
+- Choose a shield with a middle-click in your inventory.
+- Automatically equip it alongside a one-handed weapon.
+- Optionally unequip it when you put the weapon away.
+- Remember your selection between sessions.
 
-This places a shield marker on the selected item. The selection remains saved after logout unless you deselect it.
+## Installation
 
-From there, simply equip a one-handed weapon to automatically equip your shield.
+Requires **Valheim 1.0.12**, **BepInExPack_Valheim 5.4.2350**, and
+**ValheimModding-YamlDotNet 16.3.1**.
 
-### Valheim 1.0.12 update
+1. Install the dependencies in your r2modman profile.
+2. Build the project using the instructions below.
+3. Close Valheim and copy `ShieldMeBruhReforged.dll` into your profile's
+   `BepInEx/plugins/ShieldMeBruhReforged/` directory.
+4. Launch with **Start modded**.
 
-Version 1.0.0 targets Valheim **1.0.12** only. Requires **BepInExPack_Valheim 5.4.2350** and **ValheimModding-YamlDotNet 16.3.1**. Jotunn is not required.
+Disable or remove the original ShieldMeBruh first. Reforged starts with fresh
+settings and shield selection.
 
-Reforged uses plugin ID and character save-data key `augusdogus.mods.shieldmebruhreforged`, with configuration at `BepInEx/config/augusdogus.mods.shieldmebruhreforged.cfg`. It starts with fresh settings and shield selection. It does not read or migrate the original mod's configuration or saved selection.
+Compilation and compatibility checks pass; in-game testing is still pending.
 
-To install with r2modman, disable the original ShieldMeBruh mod, install the dependencies, and import the ZIP through **Import local mod**. Use author `AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.0`. For manual installation, remove the original mod's DLL from the profile and copy `plugins/ShieldMeBruhReforged.dll` from the ZIP into `BepInEx/plugins`. Run only one version of the mod at a time.
+## Controls
 
-### Building and checking compatibility
+**Middle-click** a shield in your inventory to select it. Click it again to
+deselect. A shield marker shows your selection.
 
-Requires the .NET 8 SDK or newer, the current Valheim client, and a BepInEx installation. Game assemblies are publicized automatically during the build and are never packaged with the mod.
+Auto-equip and auto-unequip can be toggled in the mod's BepInEx configuration.
+
+## Build
+
+Requires .NET SDK 8 or later and the game dependencies above.
 
 ```sh
 dotnet build ShieldMeBruhReforged.sln -c Release \
   -p:GameDir="/path/to/Valheim" \
   -p:BepInExDir="/path/to/profile/BepInEx"
-
-dotnet run --project tests/CompatibilityCheck \
-  -p:BepInExDir="/path/to/profile/BepInEx" -- \
-  "/path/to/Valheim/valheim_Data/Managed" \
-  "/path/to/profile/BepInEx" \
-  "ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll"
-
-dotnet build ShieldMeBruhReforged/ShieldMeBruhReforged.csproj -c Release -t:Package \
-  -p:GameDir="/path/to/Valheim" \
-  -p:BepInExDir="/path/to/profile/BepInEx"
 ```
 
-The package is written to `artifacts/ShieldMeBruhReforged-1.0.0-valheim-1.0.12.zip`. If your installation uses a different data directory, pass `-p:ManagedDir="/path/to/Managed"` to the build.
+Output: `ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll`.
 
-The compatibility check validates Harmony targets, injected parameters, compiled game references, and the embedded marker image. It does not run the game. Before considering the update game-tested, verify:
+[Development instructions](DEVELOPMENT.md) · [Changelog](CHANGELOG.md)
 
-* Middle-click selection and deselection, then one-handed weapon equip and unequip.
-* Moving the selected shield within the inventory, into a chest, and onto the ground.
-* Saved selection after logout, death, and tombstone recovery.
-* Disabling and re-enabling auto-shield, including starting with it disabled.
+---
 
-### Changelog
-[Patch notes](CHANGELOG.md)
-
-### Credits
-
-Original code and artwork by [Vapok](https://github.com/Vapok), from [ShieldMeBruh](https://github.com/Vapok/ShieldMeBruh). The original [MIT license and copyright notice](LICENSE.md) are retained. Reforged is independently maintained; please do not direct fork-specific support requests to the original author.
+Based on [Shield Me Bruh! by Vapok](https://github.com/Vapok/ShieldMeBruh).
+Original code and artwork retained under the [MIT license](LICENSE.md).

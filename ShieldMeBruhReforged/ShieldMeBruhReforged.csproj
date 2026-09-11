@@ -34,7 +34,7 @@
         <MakeDir Directories="$(PackageDir)plugins;$(ArtifactDir)" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PackageDir)plugins" />
         <ItemGroup>
-            <PackageMetadata Include="../manifest.json;../README.md;../CHANGELOG.md;../LICENSE.md;../icon.png;../banner.png;../artwork/FONT-LICENSE.txt" />
+            <PackageMetadata Include="../manifest.json;../README.md;../DEVELOPMENT.md;../CHANGELOG.md;../LICENSE.md;../icon.png;../banner.png;../artwork/FONT-LICENSE.txt" />
         </ItemGroup>
         <Copy SourceFiles="@(PackageMetadata)" DestinationFolder="$(PackageDir)" />
         <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(ArtifactDir)/ShieldMeBruhReforged-$(Version)-valheim-1.0.12.zip" Overwrite="true" />
