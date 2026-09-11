@@ -1,4 +1,6 @@
-# Shield Me Bruh Reforged
+<p align="center">
+  <img src="banner.png" alt="Shield Me Bruh Reforged: auto-equip shields for Valheim" width="900">
+</p>
 
 An independent fork of [Shield Me Bruh! by Vapok](https://github.com/Vapok/ShieldMeBruh), maintained by AugusDogus for Valheim 1.0.12. Automatically equips a selected shield when a one-handed weapon is equipped.
 
