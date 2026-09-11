@@ -1,6 +1,15 @@
-# Shield Me Bruh! Patchnotes
+# Shield Me Bruh Reforged Patchnotes
 
-## 1.1.2 - Updating Dependencies
+## 1.0.0 - Independent fork for Valheim 1.0.12
+* Rename the mod, assembly, and package to ShieldMeBruhReforged.
+* Use a new plugin ID, configuration file, and character save-data key, without migrating original settings or shield selections.
+* Target .NET Standard 2.1 and the current Valheim game assemblies.
+* Use Valheim's new InventoryElement component for shield selection and markers.
+* Replace the bundled Vapok library and Jotunn initialization with BepInEx configuration and logging.
+* Keep inventory input registered when auto-shield starts disabled, so enabling it during play works.
+* Add a portable build, automatic assembly publicizing, a ZIP packaging target, and static compatibility checks.
+
+## Upstream 1.1.2 - Updating Dependencies
 * Updated to latest version of dependencies
 
 <details>
