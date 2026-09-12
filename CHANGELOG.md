@@ -12,7 +12,7 @@
 * Clear the saved preference only when explicitly deselecting a shield.
 * Keep inventory input registered when auto-shield starts disabled.
 * Add portable builds, ZIP packaging, persistence and lifecycle tests, and static compatibility checks.
-* Build and validate packages in GitHub Actions, and publish stable releases to Thunderstore.
+* Build and validate packages in GitHub Actions; version tags create GitHub releases and publish to Thunderstore.
 
 ## Upstream 1.1.2 - Updating Dependencies
 * Updated to latest version of dependencies

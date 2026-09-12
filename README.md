@@ -43,8 +43,8 @@ plain-text custom data that vanilla does not use.
 
 Requires .NET SDK 8 or later and the game dependencies above.
 
-GitHub Actions also builds and checks the plugin automatically. Published stable
-GitHub releases upload the built package to Thunderstore once publishing is configured.
+GitHub Actions builds and checks the plugin automatically. Pushing a version tag
+creates a GitHub release with the built ZIP and publishes it to Thunderstore.
 
 ```sh
 dotnet build ShieldMeBruhReforged.sln -c Release \

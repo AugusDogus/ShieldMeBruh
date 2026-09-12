@@ -56,7 +56,7 @@ Import the ZIP through r2modman's **Import local mod**. Use author
 ## GitHub Actions
 
 The **Build and publish** workflow compiles the plugin on GitHub for pushes to
-`main`, pull requests, manual runs, and published releases. It downloads current
+`main`, pull requests, manual runs, and version tags. It downloads current
 public Valheim dedicated-server assemblies through anonymous SteamCMD and the
 BepInEx version listed in `manifest.json`. No local game installation or Steam
 credentials are needed. This follows [Jötunn's CI approach](https://github.com/Valheim-Modding/Jotunn/blob/master/.github/workflows/pull-request.yml).
@@ -74,16 +74,18 @@ For publishing, configure these repository Actions settings:
 Keep version `1.0.0` until the first public release; commits identify development
 builds. For later releases, update the version in `manifest.json`, the project file,
 `BepInPlugin`, and both assembly version attributes, then update the changelog.
-Commit and push, then publish a stable GitHub release tagged `v1.0.0` or `1.0.0`
-(using the matching version).
-The tag must match the source versions. The workflow builds the tagged source,
-attaches its ZIP to the release, and uploads that same ZIP using Thunderstore's
-official CLI. You do not need to build or attach anything manually.
+Commit and push, then push a tag named `v1.0.0` (using the matching version).
+Tags must use `vMAJOR.MINOR.PATCH` and match the source versions. The workflow
+builds and checks the tagged source, creates a GitHub release with generated notes
+and the ZIP attached, then uploads that same ZIP using Thunderstore's official CLI.
+You do not need to build, create the release, or attach anything manually.
 
-Pull requests, ordinary pushes, manual runs, and prereleases only build and check;
-they do not publish to Thunderstore. If publishing fails, the built artifact remains
-available. After correcting missing credentials or settings, rerun the failed job.
-For a version already published to Thunderstore, make a new version instead.
+Pull requests, branch pushes, and manual runs only build and check. Prerelease
+tags such as `v1.0.0-rc.1` do not trigger the workflow. Manually publishing a GitHub
+release does not trigger it either. If publishing fails, the built artifact remains
+available. After correcting missing credentials or settings, rerun the failed job;
+it reuses an existing GitHub release and replaces its ZIP. For a version already
+published to Thunderstore, make a new version instead.
 
 ## Plugin identity
 
