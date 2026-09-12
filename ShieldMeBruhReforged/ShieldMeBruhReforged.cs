@@ -6,7 +6,7 @@ using ShieldMeBruhReforged.Features;
 
 namespace ShieldMeBruhReforged;
 
-[BepInPlugin(PluginId, "Shield Me Bruh Reforged", "1.0.1")]
+[BepInPlugin(PluginId, "Shield Me Bruh Reforged", "1.0.0")]
 public class ShieldMeBruhReforged : BaseUnityPlugin
 {
     public const string PluginId = "augusdogus.mods.shieldmebruhreforged";

@@ -48,10 +48,10 @@ dotnet build ShieldMeBruhReforged/ShieldMeBruhReforged.csproj -c Release -t:Pack
   -p:BepInExDir="/path/to/profile/BepInEx"
 ```
 
-Output: `artifacts/ShieldMeBruhReforged-1.0.1-valheim-1.0.12.zip`.
+Output: `artifacts/ShieldMeBruhReforged-1.0.0-valheim-1.0.12.zip`.
 
 Import the ZIP through r2modman's **Import local mod**. Use author
-`AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.1`.
+`AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.0`.
 
 ## GitHub Actions
 
@@ -71,9 +71,11 @@ For publishing, configure these repository Actions settings:
 - Secret `TCLI_AUTH_TOKEN`: a service-account token for that Thunderstore team.
   Create it under Thunderstore **Settings > Teams > AugusDogus > Service Accounts**.
 
-To release, update the version in `manifest.json`, the project file, `BepInPlugin`,
-and both assembly version attributes, then update the changelog. Commit and push,
-then publish a stable GitHub release tagged `v1.0.1` or `1.0.1` (using the new version).
+Keep version `1.0.0` until the first public release; commits identify development
+builds. For later releases, update the version in `manifest.json`, the project file,
+`BepInPlugin`, and both assembly version attributes, then update the changelog.
+Commit and push, then publish a stable GitHub release tagged `v1.0.0` or `1.0.0`
+(using the matching version).
 The tag must match the source versions. The workflow builds the tagged source,
 attaches its ZIP to the release, and uploads that same ZIP using Thunderstore's
 official CLI. You do not need to build or attach anything manually.
@@ -94,5 +96,6 @@ respective `m_customData` dictionaries. Values are GUIDs in `N` format. Valheim'
 normal character and item serialization persists them. Only explicit deselection
 clears the character preference; leaving the inventory does not. A missing shield
 is inactive until its ID is found again, regardless of its inventory coordinates.
-Invalid values mean no selection. Earlier slot/YAML values are not migrated, so
-select the shield once after updating from 1.0.0. No serialization library is required.
+Invalid values mean no selection. Earlier development builds' slot/YAML values
+are not migrated; select the shield once when switching from those builds.
+No serialization library is required.

@@ -1,22 +1,17 @@
 # Shield Me Bruh Reforged Patchnotes
 
-## 1.0.1 - Remember the preferred shield
-* Identify the selected shield by a persistent item ID instead of inventory coordinates.
+## 1.0.0 - Independent fork for Valheim 1.0.12 (unreleased)
+* Rename the mod, assembly, and package to ShieldMeBruhReforged.
+* Use a new plugin ID and configuration file without migrating original settings or shield selections.
+* Target .NET Standard 2.1 and the current Valheim game assemblies.
+* Use Valheim's InventoryElement component for shield selection and markers.
+* Replace the bundled Vapok library and Jotunn initialization with BepInEx configuration and logging.
+* Remove YamlDotNet and remember the preferred shield through native character and item metadata.
 * Preserve the preference through storage, logout, death, and recovery into another slot.
 * Restore markers on inventory refresh without requiring a grid resize.
-* Remove movement hooks that incorrectly cleared saved selection during tombstone recovery.
-* Select your preferred shield once after updating from 1.0.0.
-
-## 1.0.0 - Independent fork for Valheim 1.0.12
-* Rename the mod, assembly, and package to ShieldMeBruhReforged.
-* Use a new plugin ID, configuration file, and character save-data key, without migrating original settings or shield selections.
-* Target .NET Standard 2.1 and the current Valheim game assemblies.
-* Use Valheim's new InventoryElement component for shield selection and markers.
-* Replace the bundled Vapok library and Jotunn initialization with BepInEx configuration and logging.
-* Remove YamlDotNet and store shield coordinates as validated text in character metadata.
-* Clear the saved selection when deselecting a shield.
-* Keep inventory input registered when auto-shield starts disabled, so enabling it during play works.
-* Add a portable build, automatic assembly publicizing, a ZIP packaging target, and static compatibility checks.
+* Clear the saved preference only when explicitly deselecting a shield.
+* Keep inventory input registered when auto-shield starts disabled.
+* Add portable builds, ZIP packaging, persistence and lifecycle tests, and static compatibility checks.
 * Build and validate packages in GitHub Actions, and publish stable releases to Thunderstore.
 
 ## Upstream 1.1.2 - Updating Dependencies
