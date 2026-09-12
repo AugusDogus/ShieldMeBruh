@@ -1,5 +1,9 @@
 # Shield Me Bruh Reforged Patchnotes
 
+## 1.0.1
+
+- Fix Thunderstore banner and screenshot links using public GitHub images pinned to the release tag.
+
 ## 1.0.0 - Independent fork for Valheim 1.0.12
 * Rename the mod, assembly, and package to ShieldMeBruhReforged.
 * Use a new plugin ID and configuration file without migrating original settings or shield selections.

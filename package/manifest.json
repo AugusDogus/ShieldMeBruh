@@ -1,6 +1,6 @@
 {
   "name": "ShieldMeBruhReforged",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/AugusDogus/ShieldMeBruh",
   "description": "Auto-equip your preferred shield with one-handed weapons. Remember your selection across sessions, storage, and death recovery.",
   "dependencies": [

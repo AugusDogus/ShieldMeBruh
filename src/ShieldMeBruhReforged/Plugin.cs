@@ -11,7 +11,7 @@ public class ShieldMeBruhReforged : BaseUnityPlugin
 {
     public const string PluginId = "augusdogus.mods.shieldmebruhreforged";
 
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.0.1";
 
     private Harmony _harmony;
 
