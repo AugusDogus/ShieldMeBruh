@@ -1,6 +1,6 @@
 # Shield Me Bruh Reforged Patchnotes
 
-## 1.0.0 - Independent fork for Valheim 1.0.12 (unreleased)
+## 1.0.0 - Independent fork for Valheim 1.0.12
 * Rename the mod, assembly, and package to ShieldMeBruhReforged.
 * Use a new plugin ID and configuration file without migrating original settings or shield selections.
 * Target .NET Standard 2.1 and the current Valheim game assemblies.

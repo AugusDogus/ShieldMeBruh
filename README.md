@@ -25,7 +25,7 @@ Requires **Valheim 1.0.12** and **BepInExPack_Valheim 5.4.2350**.
 Disable or remove the original ShieldMeBruh first. Reforged starts with fresh
 settings and shield selection.
 
-Compilation and compatibility checks pass; in-game testing is still pending.
+Build and compatibility checks run in GitHub Actions.
 
 ## Controls
 
