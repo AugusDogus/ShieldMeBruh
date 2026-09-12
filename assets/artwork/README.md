@@ -1,7 +1,7 @@
-# Banner artwork
+# Artwork
 
-The README banner follows Buildheim's flat forest-green background and cream
-lettering. It uses the existing shield and sword artwork from
+The README banner and package icon follow Buildheim's flat forest-green
+background. Both use the existing shield and sword artwork from
 `src/ShieldMeBruhReforged/Resources/shield.png`, originally created for Vapok's
 ShieldMeBruh. The original image is embedded unchanged in the SVG, with its
 transparent margins excluded from the visible frame.
@@ -11,8 +11,9 @@ Lettering is converted to paths for consistent rendering. Font notices are
 included in `FONT-LICENSE.txt`; the original artwork remains covered by the
 repository's MIT license.
 
-Render the PNG from the repository root with librsvg:
+Render the PNG assets from the repository root with librsvg:
 
 ```sh
 rsvg-convert assets/artwork/banner.svg -o package/banner.png
+rsvg-convert assets/artwork/icon.svg -o package/icon.png
 ```

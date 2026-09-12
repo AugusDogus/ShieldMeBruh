@@ -59,5 +59,4 @@ Output: `src/ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforge
 
 ---
 
-Based on [Shield Me Bruh! by Vapok](https://github.com/Vapok/ShieldMeBruh).
-Original code and artwork retained under the [MIT license](LICENSE.md).
+Code and artwork licensed under the [MIT license](LICENSE.md).

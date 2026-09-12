@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ShieldMeBruhReforged")]
 [assembly:
     AssemblyDescription(
-        "Auto-equip a selected shield in Valheim 1.0.12. An independent fork of Shield Me Bruh by Vapok.")]
+        "Auto-equip a selected shield in Valheim 1.0.12.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ShieldMeBruhReforged")]
 [assembly: AssemblyProduct("ShieldMeBruhReforged")]
