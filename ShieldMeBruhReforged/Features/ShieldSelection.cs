@@ -1,32 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace ShieldMeBruhReforged.Features;
 
 internal static class ShieldSelection
 {
-    // Valheim persists this dictionary as strings in the character save.
-    public static (int X, int Y)? Read(IDictionary<string, string> data, string key, int width, int height)
+    // Both character and item custom data are persisted by Valheim as ordinary strings.
+    public static Guid? Read(IDictionary<string, string> data, string key)
     {
-        if (!data.TryGetValue(key, out var value) || string.IsNullOrEmpty(value))
-            return null;
-
-        var coordinates = value.Split(',');
-        if (coordinates.Length != 2 ||
-            !int.TryParse(coordinates[0], NumberStyles.None, CultureInfo.InvariantCulture, out var x) ||
-            !int.TryParse(coordinates[1], NumberStyles.None, CultureInfo.InvariantCulture, out var y) ||
-            x < 0 || x >= width || y < 0 || y >= height)
-            return null;
-
-        return (x, y);
+        return data.TryGetValue(key, out var value) && Guid.TryParseExact(value, "N", out var id) && id != Guid.Empty
+            ? id
+            : null;
     }
 
-    public static void Save(IDictionary<string, string> data, string key, (int X, int Y)? selection)
+    public static bool IsSelected(IDictionary<string, string> character, IDictionary<string, string> item, string key)
     {
-        if (selection is { } slot)
-            data[key] = FormattableString.Invariant($"{slot.X},{slot.Y}");
-        else
-            data.Remove(key);
+        return Read(character, key) is { } selected && Read(item, key) == selected;
     }
+
+    public static void Select(IDictionary<string, string> character, IDictionary<string, string> item, string key)
+    {
+        var id = Read(item, key) ?? Guid.NewGuid();
+        item[key] = id.ToString("N");
+        character[key] = item[key];
+    }
+
+    public static void Clear(IDictionary<string, string> character, string key) => character.Remove(key);
 }

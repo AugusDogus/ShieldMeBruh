@@ -9,7 +9,7 @@ Automatically equip your preferred shield when you draw a one-handed weapon.
 - Choose a shield with a middle-click in your inventory.
 - Automatically equip it alongside a one-handed weapon.
 - Optionally unequip it when you put the weapon away.
-- Remember your selection between sessions.
+- Remember the same shield across sessions, storage, and death recovery.
 
 ## Installation
 
@@ -34,8 +34,10 @@ deselect. A shield marker shows your selection.
 
 Auto-equip and auto-unequip can be toggled in the mod's BepInEx configuration.
 
-Your selection is stored as plain-text coordinates in the character's custom
-data. Deselecting removes the entry. Vanilla does not use this mod-specific entry.
+Your character remembers the selected shield's ID. Storing it or dying keeps the
+preference; it resumes when that shield returns, even in another inventory slot.
+Only deselecting or choosing another shield changes the preference. These IDs are
+plain-text custom data that vanilla does not use.
 
 ## Build
 

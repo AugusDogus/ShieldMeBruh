@@ -12,10 +12,13 @@ Run the selection persistence checks without game dependencies:
 
 ```sh
 dotnet run --project tests/SelectionCheck
+dotnet run --project tests/LifecycleCheck
 ```
 
-These cover round trips, deselection, malformed and out-of-bounds coordinates,
-culture-independent formatting, and preservation of unrelated metadata.
+These cover saved identities, deselection, invalid metadata, storage and return,
+logout and respawn, tombstone recovery into a different slot, and marker refresh
+without a grid resize. Lifecycle checks execute the production feature and patches
+with in-memory game and Unity collaborators.
 
 Check the compiled plugin against your installed game:
 
@@ -33,7 +36,7 @@ and the embedded marker image. It does not run the game.
 Before considering the update game-tested, verify:
 
 - Middle-click selection and deselection, then one-handed weapon equip and unequip.
-- Moving the selected shield within the inventory, into a chest, and onto the ground.
+- Moving the selected shield within the inventory, storing or dropping it, and retrieving it in a different slot.
 - Saved selection after logout, death, and tombstone recovery.
 - Disabling and re-enabling auto-shield, including starting with it disabled.
 
@@ -45,10 +48,10 @@ dotnet build ShieldMeBruhReforged/ShieldMeBruhReforged.csproj -c Release -t:Pack
   -p:BepInExDir="/path/to/profile/BepInEx"
 ```
 
-Output: `artifacts/ShieldMeBruhReforged-1.0.0-valheim-1.0.12.zip`.
+Output: `artifacts/ShieldMeBruhReforged-1.0.1-valheim-1.0.12.zip`.
 
 Import the ZIP through r2modman's **Import local mod**. Use author
-`AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.0`.
+`AugusDogus`, name `ShieldMeBruhReforged`, and version `1.0.1`.
 
 ## GitHub Actions
 
@@ -70,7 +73,7 @@ For publishing, configure these repository Actions settings:
 
 To release, update the version in `manifest.json`, the project file, `BepInPlugin`,
 and both assembly version attributes, then update the changelog. Commit and push,
-then publish a stable GitHub release tagged `v1.0.0` or `1.0.0` (using the new version).
+then publish a stable GitHub release tagged `v1.0.1` or `1.0.1` (using the new version).
 The tag must match the source versions. The workflow builds the tagged source,
 attaches its ZIP to the release, and uploads that same ZIP using Thunderstore's
 official CLI. You do not need to build or attach anything manually.
@@ -86,7 +89,10 @@ The plugin ID and character save-data key are `augusdogus.mods.shieldmebruhrefor
 Configuration is stored at `BepInEx/config/augusdogus.mods.shieldmebruhreforged.cfg`.
 Reforged does not read or migrate the original mod's configuration or saved selection.
 
-The selection value is `x,y` with invariant integer formatting in `Player.m_customData`.
-Valheim's existing character save/load code persists it. Missing, malformed, and
-out-of-bounds values mean no selection; deselecting removes the key. Earlier YAML
-values are not migrated. No serialization library is required.
+The character preference and selected item's ID use the plugin key in their
+respective `m_customData` dictionaries. Values are GUIDs in `N` format. Valheim's
+normal character and item serialization persists them. Only explicit deselection
+clears the character preference; leaving the inventory does not. A missing shield
+is inactive until its ID is found again, regardless of its inventory coordinates.
+Invalid values mean no selection. Earlier slot/YAML values are not migrated, so
+select the shield once after updating from 1.0.0. No serialization library is required.

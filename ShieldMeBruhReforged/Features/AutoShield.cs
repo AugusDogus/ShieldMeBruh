@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using BepInEx.Configuration;
-using ShieldMeBruhReforged.Patches;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -14,9 +13,7 @@ public class AutoShield : IDisposable
     private InventoryGrid _activeInstance;
 
     private Sprite _shield;
-    public InventoryElement CurrentElement;
-    public bool FeatureInitialized = false;
-    public ItemDrop.ItemData SelectedShield;
+    private InventoryElement _currentElement;
 
     public ConfigEntry<bool> EnableAutoShield;
     public ConfigEntry<bool> EnableAutoUnequip;
@@ -28,10 +25,12 @@ public class AutoShield : IDisposable
         EnableAutoUnequip = config.Bind("Local Config", "Enable Auto Unequip", true,
             "When enabled, when one handed weapon is unequipped, the marked equipped shield, will also unequip.");
         EnableAutoShield.SettingChanged += OnEnabledChanged;
-        FeatureInitialized = EnableAutoShield.Value;
     }
 
-    private void OnEnabledChanged(object sender, EventArgs args) => SetEnabledStatus();
+    private void OnEnabledChanged(object sender, EventArgs args)
+    {
+        if (_activeInstance != null) RefreshSelection(_activeInstance);
+    }
 
     public void Dispose() => EnableAutoShield.SettingChanged -= OnEnabledChanged;
 
@@ -44,11 +43,6 @@ public class AutoShield : IDisposable
     public void SetActiveInstance(InventoryGrid instance)
     {
         _activeInstance = instance;
-    }
-
-    public InventoryGrid GetActiveInstance()
-    {
-        return _activeInstance;
     }
 
     public static Texture2D LoadImage(byte[] bytes)
@@ -142,136 +136,65 @@ public class AutoShield : IDisposable
         return obj;
     }
 
+    public ItemDrop.ItemData GetSelectedShield(Player player)
+    {
+        foreach (var item in player.GetInventory().GetAllItems())
+        {
+            if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield &&
+                ShieldSelection.IsSelected(player.m_customData, item.m_customData, ShieldMeBruhReforged.PluginId))
+                return item;
+        }
+        return null;
+    }
+
     public void OnMiddleClick(UIInputHandler middleClick)
     {
-        if (!FeatureInitialized || Player.m_localPlayer == null || _activeInstance == null)
+        if (!EnableAutoShield.Value || Player.m_localPlayer is not { } player ||
+            _activeInstance == null || middleClick == null)
             return;
 
-        if (middleClick == null || middleClick.gameObject == null) return;
+        var inventory = player.GetInventory();
+        if (_activeInstance.m_inventory != inventory) return;
 
-        var player = Player.m_localPlayer;
+        var position = _activeInstance.GetButtonPos(middleClick.gameObject);
+        var item = inventory.GetItemAt(position.x, position.y);
+        if (item == null || item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Shield) return;
 
-        var buttonPos = _activeInstance.GetButtonPos(middleClick.gameObject);
-        ShieldMeBruhReforged.Log.LogDebug($"Button Pressed on {buttonPos.x},{buttonPos.y}");
-
-        var itemAt = _activeInstance.m_inventory.GetItemAt(buttonPos.x, buttonPos.y);
-
-        if (itemAt == null) return;
-
-        ShieldMeBruhReforged.Log.LogDebug($"Item Name {itemAt.m_shared.m_name} of type {itemAt.m_shared.m_itemType}");
-
-
-        if (itemAt.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Shield) return;
-
-        var targetVector = new Vector2i(buttonPos.x, buttonPos.y);
-        var selectedElement = _activeInstance.GetElement(buttonPos.x, buttonPos.y, _activeInstance.m_width);
-
-        if (CurrentElement == null)
-        {
-            ApplyShieldToElement(selectedElement, itemAt, true);
-        }
-        else if (CurrentElement.Position == targetVector)
-        {
-            ResetCurrentSheildElement();
-        }
-        else if (CurrentElement.Position != targetVector)
-        {
-            var oldShield = _activeInstance.GetInventory().GetItemAt(CurrentElement.Position.x, CurrentElement.Position.y);
-            var newShield = itemAt;
-
-            ResetCurrentSheildElement();
-            ApplyShieldToElement(selectedElement, itemAt, true);
-
-            if (oldShield != null && oldShield.m_equipped) player.EquipItem(newShield);
-        }
-    }
-
-    public void SetShieldStatus(bool statusSetTo)
-    {
-        FeatureInitialized = EnableAutoShield.Value;
-        
-        if (EnableAutoShield.Value)
-        {
-            if (statusSetTo)
-            {
-                if (Player.m_localPlayer is { } player && CurrentElement != null && SelectedShield != null)
-                {
-                    //Validate Location and Item
-                    var itemAt = player.GetInventory().GetItemAt(CurrentElement.Position.x, CurrentElement.Position.y);
-
-                    if (itemAt != SelectedShield)
-                        statusSetTo = false;
-                }
-            }
-            if (CurrentElement != null)
-            {
-                GetShield(CurrentElement).enabled = statusSetTo;
-            }
-        }
-    }
-    
-    public void SetEnabledStatus()
-    {
-        FeatureInitialized = EnableAutoShield.Value;
-        
-        if (EnableAutoShield.Value)
-        {
-            if (CurrentElement != null)
-            {
-                GetShield(CurrentElement).enabled = true;
-            }
-            return;
-        }
-
-        if (CurrentElement != null)
-            GetShield(CurrentElement).enabled = false;
-    }
-
-    public void ResetCurrentSheildElement(InventoryElement selectedElement = null)
-    {
-        if (CurrentElement != null && selectedElement == null) GetShield(CurrentElement).enabled = false;
-
-        if (selectedElement != null)
-            GetShield(selectedElement).enabled = false;
-
-        CurrentElement = null;
-        SelectedShield = null;
-        SaveShieldSelection();
-    }
-
-    public void ApplyShieldToElement(InventoryElement selectedElement, ItemDrop.ItemData itemAt, bool allowReset = false)
-    {
-        if (itemAt.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Shield)
-            return;
-        
-        var img = GetShield(selectedElement);
-
-        img.enabled = true;
-
-        if (CurrentElement == null)
-        {
-            CurrentElement = selectedElement;
-            SelectedShield = itemAt;
-        }
+        var previous = GetSelectedShield(player);
+        if (previous == item)
+            ShieldSelection.Clear(player.m_customData, ShieldMeBruhReforged.PluginId);
         else
-        {
-            if ((CurrentElement.Position == selectedElement.Position && allowReset) || selectedElement.Position.x < 0 ||
-                selectedElement.Position.y < 0)
-            {
-                GetShield(CurrentElement).enabled = false;
-                CurrentElement = null;
-                SelectedShield = null;
-            }
-            else
-            {
-                CurrentElement = selectedElement;
-                SelectedShield = itemAt;
-            }
-        }
+            ShieldSelection.Select(player.m_customData, item.m_customData, ShieldMeBruhReforged.PluginId);
 
-        SaveShieldSelection();
-        
-        SetEnabledStatus();
+        RefreshSelection(_activeInstance);
+        if (previous != null && previous != item && previous.m_equipped)
+            player.EquipItem(item);
+    }
+
+    public void RefreshSelection(InventoryGrid grid)
+    {
+        if (Player.m_localPlayer is not { } player || grid.m_inventory != player.GetInventory()) return;
+        _activeInstance = grid;
+
+        // The saved identity survives storage and death; only the marker depends on its current slot.
+        var item = GetSelectedShield(player);
+        InventoryElement element = null;
+        if (item != null && item.m_gridPos.x >= 0 && item.m_gridPos.x < grid.m_width &&
+            item.m_gridPos.y >= 0 && item.m_gridPos.y < grid.m_height)
+            element = grid.GetElement(item.m_gridPos.x, item.m_gridPos.y, grid.m_width);
+
+        if (_currentElement != null && _currentElement != element)
+            GetShield(_currentElement).enabled = false;
+        _currentElement = element;
+        if (_currentElement != null)
+            GetShield(_currentElement).enabled = EnableAutoShield.Value;
+    }
+
+    public void ResetPlayerContext()
+    {
+        if (_currentElement != null) GetShield(_currentElement).enabled = false;
+        _currentElement = null;
+        _activeInstance = null;
     }
 
     private Image GetShield(InventoryElement element)
@@ -309,45 +232,4 @@ public class AutoShield : IDisposable
         return img;
     }
 
-    public void ResetAutoShieldOnPlayerAwake()
-    {
-        if (DeathEvent.DeathInProgress)
-            return;
-        
-        ShieldMeBruhReforged.Log.LogDebug($"Resetting Player Context");
-        _activeInstance = null;
-        CurrentElement = null;
-        SelectedShield = null;
-    }
-
-    public Vector2i? GetSavedShieldPosition()
-    {
-        if (Player.m_localPlayer is not { } player)
-            return null;
-
-        var inventory = player.GetInventory();
-        var selection = ShieldSelection.Read(player.m_customData, ShieldMeBruhReforged.PluginId,
-            inventory.GetWidth(), inventory.GetHeight());
-        return selection is { } slot ? new Vector2i(slot.X, slot.Y) : null;
-    }
-
-    private void SaveShieldSelection()
-    {
-        if (Player.m_localPlayer is { } player)
-            ShieldSelection.Save(player.m_customData, ShieldMeBruhReforged.PluginId,
-                CurrentElement != null ? (CurrentElement.Position.x, CurrentElement.Position.y) : null);
-    }
-    
-    public static class ResetEvent
-    {
-        public static void PerformReset(Player player)
-        {
-            if (Player.m_localPlayer == null)
-                return;
-            
-            player.UnequipItem(player.m_rightItem, false);
-            player.UnequipItem(player.m_leftItem, false);
-            ShieldMeBruhReforged.AutoShield.ResetAutoShieldOnPlayerAwake();
-        }
-    }
 }

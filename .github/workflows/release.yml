@@ -49,8 +49,10 @@ jobs:
             -o "$RUNNER_TEMP/bepinex.zip"
           unzip -q "$RUNNER_TEMP/bepinex.zip" -d "$RUNNER_TEMP/bepinex"
 
-      - name: Check selection persistence
-        run: dotnet run --project tests/SelectionCheck -c Release
+      - name: Check selection persistence and lifecycle
+        run: |
+          dotnet run --project tests/SelectionCheck -c Release
+          dotnet run --project tests/LifecycleCheck -c Release
 
       - name: Build plugin and package
         run: |

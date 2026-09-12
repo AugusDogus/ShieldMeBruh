@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 
 namespace ShieldMeBruhReforged.Patches;
 
@@ -7,68 +7,33 @@ public static class Humanoid_Patches
     [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.EquipItem))]
     private static class HumanoidEquipItemPatch
     {
-        private static void Postfix(Humanoid __instance, ItemDrop.ItemData item, ref bool __result,
+        private static void Postfix(Humanoid __instance, ItemDrop.ItemData item, bool __result,
             ItemDrop.ItemData ___m_leftItem, bool __runOriginal)
         {
-            if (__instance is not Player player || !ShieldMeBruhReforged.AutoShield.FeatureInitialized || !__runOriginal)
+            if (__instance is not Player player || player != Player.m_localPlayer || !__runOriginal || !__result ||
+                !ShieldMeBruhReforged.AutoShield.EnableAutoShield.Value || item == null ||
+                item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.OneHandedWeapon || ___m_leftItem != null)
                 return;
 
-            if (__result && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon &&
-                ___m_leftItem == null)
-                if (ShieldMeBruhReforged.AutoShield.SelectedShield != null)
-                {
-                    var equipItem = player.m_inventory.GetItemAt(ShieldMeBruhReforged.AutoShield.CurrentElement.Position.x, ShieldMeBruhReforged.AutoShield.CurrentElement.Position.y);
-                    if (equipItem != null && equipItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
-                    {
-                        player.EquipItem(equipItem);                    
-                    }
-                }
-                else
-                {
-                    if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedPosition)
-                    {
-                        var equipItem = player.m_inventory.GetItemAt(savedPosition.x, savedPosition.y);
-                        if (equipItem != null && equipItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
-                        {
-                            player.EquipItem(equipItem);                    
-                        }
-                    }
-                }
+            var shield = ShieldMeBruhReforged.AutoShield.GetSelectedShield(player);
+            if (shield != null) player.EquipItem(shield);
         }
     }
 
     [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.UnequipItem))]
     private static class HumanoidUnequipItemPatch
     {
-        private static void Postfix(Humanoid __instance, ItemDrop.ItemData item, ItemDrop.ItemData ___m_leftItem, bool __runOriginal)
+        private static void Postfix(Humanoid __instance, ItemDrop.ItemData item,
+            ItemDrop.ItemData ___m_leftItem, bool __runOriginal)
         {
-            if (__instance is not Player player || item == null || ___m_leftItem == null || !ShieldMeBruhReforged.AutoShield.FeatureInitialized || !__runOriginal)
+            if (__instance is not Player player || player != Player.m_localPlayer || !__runOriginal ||
+                !ShieldMeBruhReforged.AutoShield.EnableAutoShield.Value ||
+                !ShieldMeBruhReforged.AutoShield.EnableAutoUnequip.Value || item == null || ___m_leftItem == null ||
+                item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.OneHandedWeapon)
                 return;
 
-            if (ShieldMeBruhReforged.AutoShield.EnableAutoUnequip.Value)
-            {
-                ItemDrop.ItemData equipItem = null;
-
-                if (ShieldMeBruhReforged.AutoShield.CurrentElement == null && ShieldMeBruhReforged.AutoShield.SelectedShield == null)
-                {
-                    if (ShieldMeBruhReforged.AutoShield.GetSavedShieldPosition() is { } savedPosition)
-                    {
-                        equipItem = player.m_inventory.GetItemAt(savedPosition.x, savedPosition.y);
-
-                        if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon &&
-                            equipItem != null && ___m_leftItem.m_shared.m_name == equipItem.m_shared.m_name &&
-                            ___m_leftItem == equipItem) player.UnequipItem(equipItem);
-                    }
-                }
-                else
-                {
-                    equipItem = player.m_inventory.GetItemAt(ShieldMeBruhReforged.AutoShield.CurrentElement.Position.x, ShieldMeBruhReforged.AutoShield.CurrentElement.Position.y);
-
-                    if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon && ShieldMeBruhReforged.AutoShield.SelectedShield != null &&
-                        equipItem != null && ___m_leftItem.m_shared.m_name == ShieldMeBruhReforged.AutoShield.SelectedShield.m_shared.m_name &&
-                        ___m_leftItem == equipItem) player.UnequipItem(equipItem);
-                }
-            }
+            if (___m_leftItem == ShieldMeBruhReforged.AutoShield.GetSelectedShield(player))
+                player.UnequipItem(___m_leftItem);
         }
     }
 }

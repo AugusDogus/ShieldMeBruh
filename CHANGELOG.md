@@ -1,5 +1,12 @@
 # Shield Me Bruh Reforged Patchnotes
 
+## 1.0.1 - Remember the preferred shield
+* Identify the selected shield by a persistent item ID instead of inventory coordinates.
+* Preserve the preference through storage, logout, death, and recovery into another slot.
+* Restore markers on inventory refresh without requiring a grid resize.
+* Remove movement hooks that incorrectly cleared saved selection during tombstone recovery.
+* Select your preferred shield once after updating from 1.0.0.
+
 ## 1.0.0 - Independent fork for Valheim 1.0.12
 * Rename the mod, assembly, and package to ShieldMeBruhReforged.
 * Use a new plugin ID, configuration file, and character save-data key, without migrating original settings or shield selections.
