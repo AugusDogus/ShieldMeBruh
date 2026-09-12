@@ -228,7 +228,6 @@ public class AutoShield : IDisposable
             img = CreateShieldedImage(element.m_icon, element.m_noteleport);
         }
 
-        img.enabled = false;
         return img;
     }
 
