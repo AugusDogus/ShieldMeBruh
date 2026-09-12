@@ -1,7 +1,7 @@
 {
   "name": "ShieldMeBruhReforged",
   "version_number": "1.0.0",
-  "website_url": "https://github.com/AugusDogus/ShieldMeBruhReforged",
+  "website_url": "https://github.com/AugusDogus/ShieldMeBruh",
   "description": "Auto-equip a selected shield in Valheim 1.0.12. An independent fork of Shield Me Bruh by Vapok.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2350"
