@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.png" alt="Shield Me Bruh Reforged: auto-equip shields for Valheim" width="900">
+  <img src="package/banner.png" alt="Shield Me Bruh Reforged: auto-equip shields for Valheim" width="900">
 </p>
 
 Automatically equip your preferred shield when you draw a one-handed weapon.
@@ -41,21 +41,21 @@ plain-text custom data that vanilla does not use.
 
 ## Build
 
-Requires .NET SDK 8 or later and the game dependencies above.
+Requires .NET SDK 8 and the game dependencies above.
 
 GitHub Actions builds and checks the plugin automatically. Pushing a version tag
 creates a GitHub release with the built ZIP and publishes it to Thunderstore.
-Use [bumpp](DEVELOPMENT.md#github-actions) to update versions and create the tag.
+Use [bumpp](docs/DEVELOPMENT.md#release) to update versions and create the tag.
 
 ```sh
-dotnet build ShieldMeBruhReforged.sln -c Release \
+dotnet build src/ShieldMeBruhReforged/ShieldMeBruhReforged.csproj -c Release \
   -p:GameDir="/path/to/Valheim" \
   -p:BepInExDir="/path/to/profile/BepInEx"
 ```
 
-Output: `ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll`.
+Output: `src/ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll`.
 
-[Development instructions](DEVELOPMENT.md) · [Changelog](CHANGELOG.md)
+[Development and releases](docs/DEVELOPMENT.md) · [Repository layout](docs/REPOSITORY.md) · [Changelog](CHANGELOG.md)
 
 ---
 

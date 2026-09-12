@@ -6,10 +6,12 @@ using ShieldMeBruhReforged.Features;
 
 namespace ShieldMeBruhReforged;
 
-[BepInPlugin(PluginId, "Shield Me Bruh Reforged", "1.0.0")]
+[BepInPlugin(PluginId, "Shield Me Bruh Reforged", PluginVersion)]
 public class ShieldMeBruhReforged : BaseUnityPlugin
 {
     public const string PluginId = "augusdogus.mods.shieldmebruhreforged";
+
+    public const string PluginVersion = "1.0.0";
 
     private Harmony _harmony;
 

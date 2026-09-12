@@ -5,10 +5,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="../../ShieldMeBruhReforged/Features/AutoShield.cs" Link="AutoShield.cs" />
-        <Compile Include="../../ShieldMeBruhReforged/Patches/Humanoid_Patches.cs" Link="Humanoid_Patches.cs" />
-        <Compile Include="../../ShieldMeBruhReforged/Patches/Player_Patches.cs" Link="Player_Patches.cs" />
-        <Compile Include="../../ShieldMeBruhReforged/Patches/InventoryGrid_Patches.cs" Link="InventoryGrid_Patches.cs" />
-        <Compile Include="../../ShieldMeBruhReforged/Features/ShieldSelection.cs" Link="ShieldSelection.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Features/AutoShield.cs" Link="AutoShield.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Patches/Humanoid_Patches.cs" Link="Humanoid_Patches.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Patches/Player_Patches.cs" Link="Player_Patches.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Patches/InventoryGrid_Patches.cs" Link="InventoryGrid_Patches.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Features/ShieldSelection.cs" Link="ShieldSelection.cs" />
     </ItemGroup>
 </Project>

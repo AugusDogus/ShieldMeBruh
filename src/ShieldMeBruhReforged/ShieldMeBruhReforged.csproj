@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <AssemblyName>ShieldMeBruhReforged</AssemblyName>
+        <RootNamespace>ShieldMeBruhReforged</RootNamespace>
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>12</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Version>1.0.0</Version>
-        <GameDir Condition="'$(GameDir)' == '' And '$(OS)' == 'Unix'">$(HOME)/.local/share/Steam/steamapps/common/Valheim</GameDir>
-        <GameDir Condition="'$(GameDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Valheim</GameDir>
-        <ManagedDir Condition="'$(ManagedDir)' == ''">$(GameDir)/valheim_Data/Managed</ManagedDir>
-        <BepInExDir Condition="'$(BepInExDir)' == ''">$(GameDir)/BepInEx</BepInExDir>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" ExcludeAssets="runtime" />
@@ -24,18 +22,5 @@
         <Error Condition="!Exists('$(ManagedDir)/assembly_valheim.dll')" Text="Valheim assemblies were not found in $(ManagedDir). Set GameDir to your current Valheim installation, or ManagedDir to its Managed directory." />
         <Error Condition="!Exists('$(BepInExDir)/core/BepInEx.dll') Or !Exists('$(BepInExDir)/core/0Harmony.dll')" Text="BepInEx or Harmony was not found in $(BepInExDir)/core. Set BepInExDir to your mod profile's BepInEx directory." />
     </Target>
-    <Target Name="Package" DependsOnTargets="Build">
-        <PropertyGroup>
-            <PackageDir>$(IntermediateOutputPath)package/</PackageDir>
-            <ArtifactDir>$(MSBuildProjectDirectory)/../artifacts</ArtifactDir>
-        </PropertyGroup>
-        <RemoveDir Directories="$(PackageDir)" />
-        <MakeDir Directories="$(PackageDir)plugins;$(ArtifactDir)" />
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PackageDir)plugins" />
-        <ItemGroup>
-            <PackageMetadata Include="../manifest.json;../README.md;../DEVELOPMENT.md;../CHANGELOG.md;../LICENSE.md;../icon.png;../banner.png;../artwork/FONT-LICENSE.txt" />
-        </ItemGroup>
-        <Copy SourceFiles="@(PackageMetadata)" DestinationFolder="$(PackageDir)" />
-        <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(ArtifactDir)/ShieldMeBruhReforged-$(Version)-valheim-1.0.12.zip" Overwrite="true" />
-    </Target>
+  <Import Project="../../build/Package.targets" />
 </Project>

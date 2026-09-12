@@ -6,6 +6,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="../../ShieldMeBruhReforged/Features/ShieldSelection.cs" Link="ShieldSelection.cs" />
+        <Compile Include="../../src/ShieldMeBruhReforged/Features/ShieldSelection.cs" Link="ShieldSelection.cs" />
     </ItemGroup>
 </Project>

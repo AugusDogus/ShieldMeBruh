@@ -1,16 +1,28 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const fields = [
-  ['manifest.json', /("version_number"\s*:\s*")([^"]+)(")/g],
-  ['ShieldMeBruhReforged/ShieldMeBruhReforged.csproj', /(<Version>)([^<]+)(<\/Version>)/g],
-  ['ShieldMeBruhReforged/ShieldMeBruhReforged.cs', /(\[BepInPlugin\(PluginId, "Shield Me Bruh Reforged", ")([^"]+)("\)\])/gm],
-  ['ShieldMeBruhReforged/Properties/AssemblyInfo.cs', /^(\[assembly: AssemblyVersion\(")([^"]+)("\)\])/gm],
-  ['ShieldMeBruhReforged/Properties/AssemblyInfo.cs', /^(\[assembly: AssemblyFileVersion\(")([^"]+)("\)\])/gm],
-];
+function versionFields(root) {
+  const projects = readdirSync(resolve(root, 'src'), { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .flatMap(entry => readdirSync(resolve(root, 'src', entry.name))
+      .filter(name => name.endsWith('.csproj'))
+      .map(name => `src/${entry.name}/${name}`));
+  if (projects.length !== 1) {
+    throw new Error('Expected one plugin project at src/<Mod>/<Mod>.csproj. No version files were changed.');
+  }
+  const project = projects[0];
+  const directory = project.slice(0, project.lastIndexOf('/'));
+  return [
+    ['package/manifest.json', /("version_number"\s*:\s*")([^"]+)(")/g],
+    [project, /(<Version>)([^<]+)(<\/Version>)/g],
+    [`${directory}/Plugin.cs`, /(public const string PluginVersion\s*=\s*")([^"]+)(";)/g],
+    [`${directory}/Properties/AssemblyInfo.cs`, /^(\[assembly: AssemblyVersion\(")([^"]+)("\)\])/gm],
+    [`${directory}/Properties/AssemblyInfo.cs`, /^(\[assembly: AssemblyFileVersion\(")([^"]+)("\)\])/gm],
+  ];
+}
 
 export function readVersion(root = process.cwd()) {
-  const manifest = JSON.parse(readFileSync(resolve(root, 'manifest.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(resolve(root, 'package/manifest.json'), 'utf8'));
   const version = manifest?.version_number;
   validateVersion(version);
   return version;
@@ -30,7 +42,7 @@ export function updateVersions(version, root = process.cwd()) {
   const updates = new Map();
 
   // Validate every field before writing, and replace only mod version metadata.
-  for (const [filename, pattern] of fields) {
+  for (const [filename, pattern] of versionFields(root)) {
     const path = resolve(root, filename);
     const source = updates.get(path) ?? readFileSync(path, 'utf8');
     const matches = [...source.matchAll(pattern)];

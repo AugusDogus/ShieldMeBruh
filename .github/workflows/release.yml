@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 30
     outputs:
       version: ${{ steps.package.outputs.version }}
+      name: ${{ steps.package.outputs.name }}
+      archive: ${{ steps.package.outputs.archive }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -42,40 +44,41 @@ jobs:
             +force_install_dir "$RUNNER_TEMP/valheim" \
             +login anonymous +app_update 896660 validate +quit
           test -f "$MANAGED_DIR/assembly_valheim.dll"
-          bepinex_version=$(jq -er '.dependencies[] | select(startswith("denikson-BepInExPack_Valheim-")) | ltrimstr("denikson-BepInExPack_Valheim-")' manifest.json)
+          bepinex_version=$(jq -er '.dependencies[] | select(startswith("denikson-BepInExPack_Valheim-")) | ltrimstr("denikson-BepInExPack_Valheim-")' package/manifest.json)
           curl --fail --location --retry 3 \
             "https://thunderstore.io/package/download/denikson/BepInExPack_Valheim/$bepinex_version/" \
             -o "$RUNNER_TEMP/bepinex.zip"
           unzip -q "$RUNNER_TEMP/bepinex.zip" -d "$RUNNER_TEMP/bepinex"
 
-      - name: Check selection persistence and lifecycle
-        run: |
-          dotnet run --project tests/SelectionCheck -c Release
-          dotnet run --project tests/LifecycleCheck -c Release
-
       - name: Build plugin and package
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
         run: |
-          dotnet build ShieldMeBruhReforged/ShieldMeBruhReforged.csproj \
-            -c Release -t:Package \
+          dotnet build src/*/*.csproj -c Release -t:Package \
             -p:ManagedDir="$MANAGED_DIR" -p:BepInExDir="$BEPINEX_DIR"
 
-      - name: Check game compatibility
-        run: |
-          dotnet run --project tests/CompatibilityCheck -c Release \
-            -p:BepInExDir="$BEPINEX_DIR" -- \
-            "$MANAGED_DIR" "$BEPINEX_DIR" \
-            ShieldMeBruhReforged/bin/Release/netstandard2.1/ShieldMeBruhReforged.dll
+      - name: Check plugin behavior and game compatibility
+        run: bash scripts/check.sh
+
+      - name: Check package validation
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Check version updates
+        run: node --test tests/release-version.test.mjs
 
       - name: Validate package and release version
         id: package
         env:
           RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
-        run: python3 .github/scripts/validate-package.py
+        run: python3 scripts/validate-package.py
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: thunderstore-package
-          path: artifacts/ShieldMeBruhReforged-*.zip
+          path: ${{ steps.package.outputs.archive }}
           if-no-files-found: error
 
   publish:
@@ -90,6 +93,8 @@ jobs:
       cancel-in-progress: false
     env:
       PACKAGE_VERSION: ${{ needs.build.outputs.version }}
+      PACKAGE_NAME: ${{ needs.build.outputs.name }}
+      PACKAGE_ARCHIVE: ${{ needs.build.outputs.archive }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -109,10 +114,10 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           if gh release view "$RELEASE_TAG" > /dev/null; then
-            gh release upload "$RELEASE_TAG" artifacts/ShieldMeBruhReforged-*.zip --clobber
+            gh release upload "$RELEASE_TAG" "$PACKAGE_ARCHIVE" --clobber
           else
-            gh release create "$RELEASE_TAG" artifacts/ShieldMeBruhReforged-*.zip \
-              --verify-tag --title "Shield Me Bruh Reforged $PACKAGE_VERSION" --generate-notes
+            gh release create "$RELEASE_TAG" "$PACKAGE_ARCHIVE" \
+              --verify-tag --title "$PACKAGE_NAME $PACKAGE_VERSION" --generate-notes
           fi
 
       - name: Install Thunderstore CLI
@@ -127,17 +132,8 @@ jobs:
             echo "::error::Set the TCLI_AUTH_TOKEN Actions secret and THUNDERSTORE_NAMESPACE Actions variable. The built ZIP is available on the GitHub release; rerun this job after setup."
             exit 1
           fi
-          python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          metadata = {
-              "namespace": os.environ["THUNDERSTORE_NAMESPACE"],
-              "name": "ShieldMeBruhReforged",
-              "versionNumber": os.environ["PACKAGE_VERSION"],
-          }
-          config = Path("thunderstore.toml").read_text() + "\n[package]\n"
-          config += "".join(f"{key} = {json.dumps(value)}\n" for key, value in metadata.items())
-          (Path(os.environ["RUNNER_TEMP"]) / "publish.toml").write_text(config)
-          PY
-          tcli publish --config-path "$RUNNER_TEMP/publish.toml" \
-            --file artifacts/ShieldMeBruhReforged-*.zip
+          tcli publish --config-path thunderstore.toml \
+            --package-name "$PACKAGE_NAME" \
+            --package-version "$PACKAGE_VERSION" \
+            --package-namespace "$THUNDERSTORE_NAMESPACE" \
+            --file "$PACKAGE_ARCHIVE"
