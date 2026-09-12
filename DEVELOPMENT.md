@@ -72,9 +72,27 @@ For publishing, configure these repository Actions settings:
   Create it under Thunderstore **Settings > Teams > AugusDogus > Service Accounts**.
 
 Keep version `1.0.0` until the first public release; commits identify development
-builds. For later releases, update the version in `manifest.json`, the project file,
-`BepInPlugin`, and both assembly version attributes, then update the changelog.
-Commit and push, then push a tag named `v1.0.0` (using the matching version).
+builds. Commit your changes and changelog, then use [bumpp](https://github.com/antfu-collective/bumpp)
+to update the version fields, create a release commit, and tag it:
+
+```sh
+npx bumpp@12.3.0 --release 1.0.0
+git push --atomic reforged HEAD:main v1.0.0
+```
+
+For later releases, omit `--release` to choose interactively, or use
+`--release patch`, `--release minor`, or an explicit version. Push the resulting
+tag in place of `v1.0.0`. Requires Node.js 22.18+ or 24.11+; no `package.json` is
+needed. The config updates `manifest.json`, the project version, `BepInPlugin`,
+and both assembly version attributes without changing game or dependency versions.
+Run its regression checks with `bun test tests/release-version.test.mjs`.
+
+bumpp requires a clean working tree and leaves pushing to the explicit command
+above. In this checkout, `reforged` points to our private repo and `origin` points
+to the original mod. For releases after `1.0.0`, use a fresh clone of the Reforged
+repo to avoid collisions with inherited upstream tags; that clone uses `origin`
+instead of `reforged`. Existing tags are never overwritten.
+
 Tags must use `vMAJOR.MINOR.PATCH` and match the source versions. The workflow
 builds and checks the tagged source, creates a GitHub release with generated notes
 and the ZIP attached, then uploads that same ZIP using Thunderstore's official CLI.

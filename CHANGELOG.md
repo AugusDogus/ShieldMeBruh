@@ -13,6 +13,7 @@
 * Keep inventory input registered when auto-shield starts disabled.
 * Add portable builds, ZIP packaging, persistence and lifecycle tests, and static compatibility checks.
 * Build and validate packages in GitHub Actions; version tags create GitHub releases and publish to Thunderstore.
+* Add bumpp configuration to update mod versions and create release commits and tags.
 
 ## Upstream 1.1.2 - Updating Dependencies
 * Updated to latest version of dependencies

@@ -45,6 +45,7 @@ Requires .NET SDK 8 or later and the game dependencies above.
 
 GitHub Actions builds and checks the plugin automatically. Pushing a version tag
 creates a GitHub release with the built ZIP and publishes it to Thunderstore.
+Use [bumpp](DEVELOPMENT.md#github-actions) to update versions and create the tag.
 
 ```sh
 dotnet build ShieldMeBruhReforged.sln -c Release \
