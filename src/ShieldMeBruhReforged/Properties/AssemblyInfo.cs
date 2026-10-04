@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ShieldMeBruhReforged")]
 [assembly: AssemblyProduct("ShieldMeBruhReforged")]
-[assembly: AssemblyCopyright("Copyright ©  2023")]
+[assembly: AssemblyCopyright("Copyright (c) 2023 Pete Navarra (aka Vapok); Copyright (c) 2026 AugusDogus")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
